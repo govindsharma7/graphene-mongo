@@ -69,6 +69,9 @@ class MongoengineConnectionField(ConnectionField):
 
     @property
     def default_filter_args(self):
+        # field = MongoengineConnectionField(ArticleNode)
+        # field.fields['editor'].get_type()._type._meta.model
+        # field.fields['editor'].get_type()._type
         def is_filterable(kv):
             return hasattr(kv[1], '_type') \
                 and callable(getattr(kv[1]._type, '_of_type', None))

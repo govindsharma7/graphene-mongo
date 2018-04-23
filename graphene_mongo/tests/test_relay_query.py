@@ -255,7 +255,7 @@ def test_should_mutate():
     assert result.data == expected
 
 
-def test_should_filter():
+def test_should_filter_by_field():
 
     class Query(graphene.ObjectType):
         node = Node.Field()
@@ -294,6 +294,49 @@ def test_should_filter():
     assert not result.errors
     assert result.data == expected
 
+
+def test_should_filter_by_reference_field():
+
+    class Query(graphene.ObjectType):
+        node = Node.Field()
+        articles = MongoengineConnectionField(ArticleNode)
+
+    query = '''
+        query ArticlesQuery {
+            articles(headline: "World") {
+                edges {
+                    node {
+                        headline,
+                        editor {
+                            id,
+                            firstName
+                        }
+                    }
+                }
+            }
+        }
+    '''
+    expected = {
+        'articles': {
+            'edges': [
+                {
+                    'node': {
+                        'headline': 'World',
+                        'editor': {
+                            'id': 'RWRpdG9yTm9kZToy',
+                            'firstName': 'Grant'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    schema = graphene.Schema(query=Query)
+    result = schema.execute(query)
+    assert not result.errors
+    assert result.data == expected
+
+        
 
 def test_should_filter_through_inheritance():
 
