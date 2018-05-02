@@ -9,6 +9,12 @@ app.debug = True
 default_query = '''
 {
   allEmployees {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    },
     edges {
       node {
         id,

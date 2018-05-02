@@ -407,6 +407,12 @@ def test_should_first_n():
     query = '''
         query EditorQuery {
             editors(first: 2) {
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                },
                 edges {
                     cursor,
                     node {
@@ -418,15 +424,21 @@ def test_should_first_n():
     '''
     expected = {
         'editors': {
+            'pageInfo': {
+                'hasNextPage': True,
+                'hasPreviousPage': False,
+                'startCursor': 'YXJyYXljb25uZWN0aW9uOjA=',
+                'endCursor': 'YXJyYXljb25uZWN0aW9uOjE='
+            },
             'edges': [
                 {
-                    'cursor': 'xxx',
+                    'cursor': 'YXJyYXljb25uZWN0aW9uOjA=',
                     'node': {
                         'firstName': 'Penny'
                     }
                 },
                 {
-                    'cursor': 'xxx',
+                    'cursor': 'YXJyYXljb25uZWN0aW9uOjE=',
                     'node': {
                         'firstName': 'Grant'
                     }
@@ -436,11 +448,9 @@ def test_should_first_n():
     }
     schema = graphene.Schema(query=Query)
     result = schema.execute(query)
-
     assert not result.errors
-    assert all(item in get_nodes(result.data, 'editors')
-               for item in get_nodes(expected, 'editors'))
-
+    assert json.dumps(result.data, sort_keys=True) == json.dumps(
+        expected, sort_keys=True)
 
 def test_should_after():
     class Query(graphene.ObjectType):
